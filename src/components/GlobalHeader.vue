@@ -57,9 +57,9 @@ const items = ref<MenuProps['items']>([
     title: '主页',
   },
   {
-    key: '/personal',
-    label: '个人空间',
-    title: '个人空间',
+    key: '/admin/userManage',
+    label: '用户管理',
+    title: '用户管理',
   },
   {
     key: '/team',
