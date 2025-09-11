@@ -52,7 +52,7 @@ class HttpRequest {
       },
     )
     this.instance.interceptors.response.use(
-      (response: AxiosResponse<ResponseData>) => {
+      (response: AxiosResponse<ResponseData>): any => {
         return this.handleResponseInterceptors(response)
       },
       (error: AxiosError) => {
@@ -89,10 +89,10 @@ class HttpRequest {
     }
     const { data } = response
 
-    if (data.code !== 200) {
+    if (data.code !== 0) {
       return Promise.reject(data)
     }
-    return data.data
+    return data
   }
   private addPendingRequest(config: RequestConfig) {
     const key = this.generateRequestKey(config)
@@ -221,7 +221,8 @@ class HttpRequest {
       try {
         const response = await this.instance.request(config)
         if (config.method?.toUpperCase() === 'GET') this.requestCache[cacheKey] = response
-        resolve(response.data.data)
+
+        resolve(response.data)
       } catch (error) {
         reject(error)
       }

@@ -5,10 +5,9 @@ import httpRequest from './service';
 onMounted(async () => {
   try {
     const res = await httpRequest.get('/health')
-    console.log(res, 'sucdess');
 
   } catch (error) {
-    // console.log(error, 'error');
+    console.log(error, 'error');
   }
 })
 </script>

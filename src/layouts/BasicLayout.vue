@@ -17,7 +17,14 @@ import GlobalHeader from '@/components/GlobalHeader.vue';
 
 </script>
 <style scoped>
-#basicLayout .ant-layout-header {
+#basicLayout .header {
+  padding-inline: 20px;
   background: #fff;
+  margin-bottom: 16px;
+}
+
+#basicLayout .content {
+  background: #fff;
+  padding: 20px;
 }
 </style>
