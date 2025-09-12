@@ -41,16 +41,18 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { message, type MenuProps } from 'ant-design-vue';
 import { LogoutOutlined } from '@ant-design/icons-vue';
 import router from '@/router';
 import { useUserStore } from '@/stores/user';
 import httpRequest from '@/service';
+import routes from '@/router/config';
+import checkAccess from '@/access/checkAccess';
 
 const userStore = useUserStore()
 const current = ref<string[]>(['/']);
-const items = ref<MenuProps['items']>([
+const originMenu = [
   {
     key: '/',
     label: '主页',
@@ -62,11 +64,26 @@ const items = ref<MenuProps['items']>([
     title: '用户管理',
   },
   {
-    key: '/team',
-    label: '团队协作',
-    title: '团队协作',
+    key: '/noAuth',
+    label: '无权限',
+    title: '无权限',
   },
-]);
+];
+
+const menuToRouteItem = (menu: any) => {
+  return routes.find((route) => {
+    return route.path === menu.key
+  })
+}
+
+const filterMenu = (originMenu: any) => {
+  return originMenu.filter((item: any) => {
+    const menuRoute: any = menuToRouteItem(item)
+    return checkAccess(userStore.userInfo, menuRoute.meta?.access)
+  })
+}
+
+const items = computed<MenuProps['items']>(() => filterMenu(originMenu))
 
 const onClickMenu = ({ key }: { key: string }) => {
   router.push(key)
