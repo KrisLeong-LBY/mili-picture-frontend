@@ -14,9 +14,8 @@
         <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items" @click="onClickMenu" />
 
       </a-col>
-      <a-col flex="160px">
+      <a-col flex="120px">
         <div class="user-login-status">
-          <!-- TODO问题待处理 -->
           <div v-if="userStore.userInfo.id">
             <a-dropdown>
               <a class="ant-dropdown-link" @click.prevent>
@@ -59,14 +58,19 @@ const originMenu = [
     title: '主页',
   },
   {
-    key: '/admin/userManage',
+    key: '/add-picture',
+    label: '创建图片',
+    title: '创建图片',
+  },
+  {
+    key: '/admin/user-manage',
     label: '用户管理',
     title: '用户管理',
   },
   {
-    key: '/noAuth',
-    label: '无权限',
-    title: '无权限',
+    key: '/admin/picture-manage',
+    label: '图片管理',
+    title: '图片管理',
   },
 ];
 

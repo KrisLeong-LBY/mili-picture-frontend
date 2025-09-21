@@ -40,9 +40,10 @@ import { message } from 'ant-design-vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import httpRequest from '@/service';
 import { useUserStore } from '@/stores/user';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter()
+const route = useRoute()
 
 interface FormData {
   userAccount: string,
@@ -60,7 +61,8 @@ const onSubmit = async () => {
     if (res) {
       await userStore.getUserInfo()
       message.success('登录成功')
-      router.replace('/')
+      const redirect: any = route.query?.redirect ?? '/'
+      router.replace(redirect)
     }
   } catch (error: any) {//TODO统一定义error接口
     message.error('登录失败，' + error.message)

@@ -1,5 +1,5 @@
 <template>
-  <div id="userManagePage">
+  <div id="user-manage-page">
     <div class="searchBar">
       <a-form layout="inline" :model="queryParams" @finish="onSearch">
         <a-form-item label="账号">

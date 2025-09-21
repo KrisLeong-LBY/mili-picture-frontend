@@ -10,7 +10,7 @@ import type {
 
 interface RequestConfig extends AxiosRequestConfig {
   showLoading?: boolean //控制是否显示加载状态
-  cancelDuplicateRequest: boolean //是否取消重复请求
+  cancelDuplicateRequest?: boolean //是否取消重复请求
   retryCount?: number //请求重试次数
   retryDelay?: number //请求重试间隔 毫秒
   // 自定义请求key

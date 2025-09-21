@@ -15,12 +15,14 @@
   "dependencies": {
     "ant-design-vue": "^4.2.6",
     "axios": "^1.11.0",
+    "file-saver": "^2.0.5",
     "pinia": "^2.2.6",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^22.9.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/eslint-config-prettier": "^10.1.0",
