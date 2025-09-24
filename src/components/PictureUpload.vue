@@ -76,7 +76,7 @@ const onUpload = async ({ file }: any) => {
     if (res) {
 
       message.success('上传成功')
-      // 可选链操作符?.表示如果onSuccess才去调用它
+      // 可选链操作符?.表示如果onSuccess存在才去调用它
       props.onSuccess?.(res)
     }
     loading.value = false
@@ -90,7 +90,7 @@ const beforeUpload = (file: any) => {
   // 图片必须是jpg或png格式且不能超过2MB
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
   if (!isJpgOrPng) {
-    message.error('不支持改格式的图片，推荐使用jpg或png');
+    message.error('不支持该格式的图片，推荐使用jpg或png');
   }
   const isLt2M = file.size / 1024 / 1024 < 2;
   if (!isLt2M) {

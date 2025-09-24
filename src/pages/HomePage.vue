@@ -32,6 +32,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// TODO 上滑加载更多
 import { computed, onMounted, reactive, ref } from 'vue';
 
 import PictureCard from '@/components/PictureCard.vue';
@@ -63,6 +64,7 @@ const pagination = computed(() => {
     pageSize: queryParams.pageSize,
     total: total.value,
     // 	页码或 pageSize 改变的回调，参数是改变后的页码及每页条数
+    // TODO并没有添加改变页码的逻辑  也就是说 只请求了第一页 可以添加上划加载更多功能
     onChange: (pageNum: any, pageSize: any) => {
       queryParams.current = pageNum
       queryParams.pageSize = pageSize

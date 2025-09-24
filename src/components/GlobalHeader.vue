@@ -20,7 +20,7 @@
             <a-dropdown>
               <a class="ant-dropdown-link" @click.prevent>
                 <a-avatar :src="userStore.userInfo.userAvatar" style="margin-right: 8px;"></a-avatar>
-                {{ userStore.userInfo.username ?? 'noName' }}
+                {{ userStore.userInfo.userName ?? 'noName' }}
 
               </a>
               <template #overlay>
@@ -48,6 +48,8 @@ import { useUserStore } from '@/stores/user';
 import httpRequest from '@/service';
 import routes from '@/router/config';
 import checkAccess from '@/access/checkAccess';
+
+// TODO 当管理员登录页面后  需要刷新一下才能正确显示菜单和用户头像用户名
 
 const userStore = useUserStore()
 const current = ref<string[]>(['/']);

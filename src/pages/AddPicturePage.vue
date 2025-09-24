@@ -1,7 +1,16 @@
 <template>
   <div id="add-picture-page">
     <h2>{{ !route.query.id ? "创建图片" : "编辑图片" }}</h2>
-    <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+    <a-tabs v-if="!route.query.id" v-model:activeKey="uploadType">
+      <a-tab-pane key="file" tab="本地上传">
+        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+      <a-tab-pane key="url" tab="URL 上传">
+        <URLPictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+    </a-tabs>
+    <PictureUpload v-else :picture="picture" :onSuccess="onSuccess" />
+
     <!-- 图片上传成功后再显示图片表单 -->
     <a-form v-if="picture" :model="pictureForm" layout="vertical" @finish="onSubmit">
       <a-form-item label="名称" name="name">
@@ -28,6 +37,8 @@
   </div>
 </template>
 <script setup lang="ts">
+
+
 import PictureUpload from '@/components/PictureUpload.vue';
 import httpRequest from '@/service';
 import { message } from 'ant-design-vue';
@@ -37,10 +48,13 @@ import { useRoute } from 'vue-router';
 
 import { useTagCategoryStore } from '@/stores/tagCategory';
 import { usePictureStore } from '@/stores/picture';
+import URLPictureUpload from '@/components/URLPictureUpload.vue';
 
 const route = useRoute()
 const tagCategoryStore = useTagCategoryStore()
 const pictureStore = usePictureStore()
+
+const uploadType = ref('file')
 
 // TODO把接口抽离出去
 interface UserVO {
@@ -160,7 +174,12 @@ onMounted(() => {
     pictureForm.name = pictureInfo?.name as string
     pictureForm.introduction = pictureInfo?.introduction as string
     pictureForm.category = pictureInfo?.category as string
-    pictureForm.tags = JSON.parse(pictureInfo?.tags ?? '[]')
+    if (typeof pictureInfo?.tags === 'string') {
+      pictureForm.tags = JSON.parse(pictureInfo?.tags ?? '[]')
+    } else {
+      pictureForm.tags = pictureInfo?.tags
+    }
+
     pictureStore.clearPicture()
   }
 

@@ -4,6 +4,7 @@ import UserLoginPage from '@/pages/user/UserLoginPage.vue'
 import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
 import NoAuthPage from '@/pages/noAuth/NoAuthPage.vue'
 import AddPicturePage from '@/pages/AddPicturePage.vue'
+import AddPictureBatchPage from '@/pages/admin/AddPictureBatchPage.vue'
 import PictureDetailPage from '@/pages/PictureDetailPage.vue'
 
 import ACCESS_ENUM from '@/access/accessEnum'
@@ -50,6 +51,14 @@ const routes = [
     path: '/add-picture',
     name: 'addPicture',
     component: AddPicturePage,
+  },
+  {
+    path: '/add-picture/batch',
+    name: 'addPictureBatch',
+    component: AddPictureBatchPage,
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
   },
   {
     path: '/picture/:id',

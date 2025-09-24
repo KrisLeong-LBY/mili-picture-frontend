@@ -2,11 +2,18 @@
   <div id="picture-manage-page">
     <a-flex justify="space-between" style="margin-bottom: 12px;">
       <h2>图片管理</h2>
-      <a-button type="primary" href="/add-picture" target="_blank">
-        <template #icon>
-          <CloudUploadOutlined />
-        </template>
-        创建图片</a-button>
+      <a-space>
+        <a-button type="primary" href="/add-picture" target="_blank">
+          <template #icon>
+            <CloudUploadOutlined />
+          </template>
+          创建图片</a-button>
+        <a-button type="primary" href="/add-picture/batch" target="_blank" ghost>
+          <template #icon>
+            <ImportOutlined />
+          </template>
+          批量创建图片</a-button>
+      </a-space>
     </a-flex>
     <div class="searchBar">
       <a-form layout="inline" :model="queryParams" @finish="onSearch">
@@ -16,13 +23,20 @@
           </a-input>
         </a-form-item>
         <a-form-item label="分类" name="category">
-          <a-select v-model:value="queryParams.category" :options="categoryOptions" style="min-width: 180px">
+          <a-select v-model:value="queryParams.category" :options="categoryOptions" style="min-width: 180px"
+            allow-clear>
             <template #suffixIcon></template>
           </a-select>
         </a-form-item>
         <a-form-item label="标签" name="tags">
           <a-select v-model:value="queryParams.tags" :options="tagOptions" mode="tags"
             style="min-width: 180px"></a-select>
+        </a-form-item>
+        <a-form-item label="审核状态" name="reviewStatus">
+          <a-select v-model:value="queryParams.reviewStatus" :options="PIC_REVIEW_STATUS_OPTIONS"
+            style="min-width: 180px" allow-clear>
+            <template #suffixIcon></template>
+          </a-select>
         </a-form-item>
         <a-form-item>
           <a-button type="primary" html-type="submit">
@@ -63,17 +77,33 @@
             </a-tag>
           </span>
         </template>
+        <template v-else-if="column.dataIndex === 'reviewMessage'">
+          <a-descriptions :column="1">
+            <a-descriptions-item label="审核状态">
+              <a-tag
+                :color="record?.reviewStatus === 0 ? 'geekblue' : record?.reviewStatus === 1 ? 'green' : 'volcano'">
+                {{ PIC_REVIEW_STATUS_MAP[record?.reviewStatus] }}
+              </a-tag>
+            </a-descriptions-item>
+            <a-descriptions-item label="审核信息">{{ record?.reviewMessage ?? '-' }}</a-descriptions-item>
+            <a-descriptions-item label="审核人">{{ record?.reviewerId ?? '-' }}</a-descriptions-item>
+          </a-descriptions>
+        </template>
         <template v-else-if="column.dataIndex === 'createTime'">
           {{ dateFormat(record.createTime) }}
         </template>
         <template v-else-if="column.dataIndex === 'editTime'">
           {{ dateFormat(record.editTime) }}
         </template>
+
         <template v-else-if="column.key === 'action'">
           <span>
-            <a-button type="primary" size="small" ghost style="margin-right: 8px;"
-              @click="onEdit(record.id, record)">编辑</a-button>
-            <a-button danger size="small" @click="onDelete(record.id)">删除</a-button>
+            <a-button class="review-pass-btn" v-if="record?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS" type="link"
+              size="small" style="color:green" @click="onReview(record.id, PIC_REVIEW_STATUS_ENUM.PASS)">通过</a-button>
+            <a-button class="review-reject-btn" v-if="record?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT"
+              type="link" size="small" @click="onReview(record.id, PIC_REVIEW_STATUS_ENUM.REJECT)">拒绝</a-button>
+            <a-button type="link" size="small" @click="onEdit(record.id, record)">编辑</a-button>
+            <a-button danger type="link" size="small" @click="onDelete(record.id)">删除</a-button>
           </span>
         </template>
       </template>
@@ -89,7 +119,8 @@ import pictureSizeFormat from '@/utils/pictureSizeFormat';
 import { useTagCategoryStore } from '@/stores/tagCategory';
 import { usePictureStore } from '@/stores/picture';
 import router from '@/router';
-import { CloudUploadOutlined } from '@ant-design/icons-vue'
+import { CloudUploadOutlined, ImportOutlined } from '@ant-design/icons-vue'
+import { PIC_REVIEW_STATUS_ENUM, PIC_REVIEW_STATUS_MAP, PIC_REVIEW_STATUS_OPTIONS } from '@/constants/picture';
 
 
 const tagCategoryStore = useTagCategoryStore()
@@ -126,10 +157,14 @@ const columns = [
     dataIndex: 'pictureInfo',
     width: 160
   },
-
   {
     title: '用户id',
     dataIndex: 'userId',
+  },
+  {
+    title: '审核信息',
+    dataIndex: 'reviewMessage',
+    width: 260
   },
   {
     title: '创建时间',
@@ -158,11 +193,13 @@ const queryParams = reactive({
   sortOrder: 'descend',
   searchText: '',
   category: '',
-  tags: []
+  tags: [],
+  reviewStatus: ''
 })
 
 const tagOptions = ref<any>([])
 const categoryOptions = ref<any>([])
+
 
 const pagination = computed(() => {
   return {
@@ -203,11 +240,21 @@ const onDelete = async (id: string) => {
     message.error('删除失败，' + error.message)
   }
 }
+const onReview = async (pictureId: number, reviewStatus: number) => {
+  const reviewMessage = reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? '管理员操作审核通过' : '管理员操作审核拒绝'
+  try {
+    await httpRequest.post('/picture/review', { id: pictureId, reviewStatus, reviewMessage })
+    message.success('审核操作成功')
+    getPictureList()
+  } catch (error: any) {
+    message.error('审核操作失败，' + error.message)
+  }
+}
 
 const getPictureList = async () => {
   try {
     const res: any = await httpRequest.post('/picture/list/page', {
-      ...queryParams
+      ...queryParams,
     })
     pictureList.value = res.records
     total.value = Number(res.total)
@@ -237,5 +284,13 @@ onMounted(() => {
 <style scoped>
 .searchBar {
   margin-bottom: 20px;
+}
+
+.review-pass-btn :deep(span) {
+  color: #389e0d;
+}
+
+.review-reject-btn :deep(span) {
+  color: #faad14;
 }
 </style>
